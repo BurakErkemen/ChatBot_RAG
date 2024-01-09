@@ -1,5 +1,27 @@
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
+import pdfplumber
+import os
+import random
+import pinecone
+# from Q_generator import generate_questions
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Pinecone
+from langchain.chat_models import ChatOpenAI
+from langchain.chains.question_answering import load_qa_chain
+from langchain.memory import ConversationSummaryBufferMemory # sorun olursa imha et
+from langchain.chains import ConversationChain # sorun olursa imha et
+from langchain.chains import RetrievalQA
+from streamlit_chat import message
+
+import openai
+import os
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv()) # read local .env file
+openai.api_key  = os.getenv('OPENAI_API_KEY')
+
+
 
 #sidebar
 with st.sidebar:
@@ -20,33 +42,12 @@ st.write("""
 # 'FU BOT' Belongs to Fırat University Faculty of Technology Software Engineering
 """)
 
-import streamlit as st
-import pdfplumber
-import os
-import random
-import pinecone
-# from Q_generator import generate_questions
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Pinecone
-from langchain.chat_models import ChatOpenAI
-from langchain.chains.question_answering import load_qa_chain
-#from langchain.memory import ConversationSummaryBufferMemory
-#from langchain.chains import ConversationChain
-from langchain.chains import RetrievalQA
-from streamlit_chat import message
-
-import openai
-import os
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv()) # read local .env file
-openai.api_key  = os.getenv('OPENAI_API_KEY')
 
 # Initialize LangChain LLM and Memory
 llm_model = "gpt-3.5-turbo-0301"
 llm = ChatOpenAI(temperature=0.0, model=llm_model)
-#memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100)
-#conversation = ConversationChain(llm=llm, memory=memory, verbose=True)
+memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100) #sorun olursa imha et
+conversation = ConversationChain(llm=llm, memory=memory, verbose=True) #sorun olursa imha et
 
 # Pinecone index name
 import pinecone      
@@ -109,6 +110,7 @@ def handle_enter():
                 except Exception as e:
                     st.session_state.chat_history.append(("Bot", f"Error - {e}"))
             st.session_state.user_input = ""  # Clear the input box after processing
+
 
 def main():
     st.title("Ask a PDF Questions")
