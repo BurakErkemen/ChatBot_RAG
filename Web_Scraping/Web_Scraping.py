@@ -17,7 +17,7 @@ pdf = FPDF()
 pdf.add_page()
 pdf.add_font("ArialUnicode", fname=r"C:\Users\burak\Downloads\ArialUnicodeMSRegular\ArialUnicodeMSRegular.ttf")
 pdf.set_font("ArialUnicode", size=12)  # Bu satır eklenmiş
-
+"""
 for i in range(1):
     height = 0 
     new_url = f"https://yazilimtf.firat.edu.tr/tr/announcements-all/{i}"
@@ -54,7 +54,7 @@ for i in range(1):
         except IndexError:
             print(f"IndexError: {i} numaralı eleman bulunamadı.")
 
-
+"""
 akademisyen = "https://yazilimtf.firat.edu.tr/academic-staffs"
 browser.get(akademisyen)
 for k in range(20):

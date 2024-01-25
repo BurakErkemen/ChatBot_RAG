@@ -10,8 +10,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Pinecone
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
-from langchain.memory import ConversationSummaryBufferMemory # sorun olursa imha et
-from langchain.chains import ConversationChain # sorun olursa imha et
+#from langchain.memory import ConversationSummaryBufferMemory # sorun olursa imha et
+#from langchain.chains import ConversationChain # sorun olursa imha et
 from langchain.chains import RetrievalQA
 from streamlit_chat import message
 
@@ -46,8 +46,8 @@ st.write("""
 # Initialize LangChain LLM and Memory
 llm_model = "gpt-3.5-turbo-0301"
 llm = ChatOpenAI(temperature=0.0, model=llm_model)
-memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100) #sorun olursa imha et
-conversation = ConversationChain(llm=llm, memory=memory, verbose=True) #sorun olursa imha et
+#memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100) #sorun olursa imha et
+#conversation = ConversationChain(llm=llm, memory=memory, verbose=True) #sorun olursa imha et
 
 # Pinecone index name
 import pinecone      
@@ -65,20 +65,16 @@ def extract_text_from_pdf(uploaded_file):
     return pages
 
 def embed_and_store(pages, embeddings_model):
-    # Embedding the documents and storing them in Pinecone
     docsearch = Pinecone.from_texts(pages, embeddings_model, index_name="chatbot")
     return docsearch
 
 def save_questions_to_file(questions, filename="generated_questions.txt", num_questions=20):
-    # Ensure we don't exceed the number of available questions
     num_questions = min(num_questions, len(questions))
 
-    # Write the questions to the file
     with open(filename, 'w') as file:
         for question in questions[:num_questions]:
             file.write(question + '\n')
 
-    # Optionally, you can also display the questions in the Streamlit app
     st.write("Generated Questions:")
     for question in questions[:num_questions]:
         st.write(question)
@@ -101,6 +97,9 @@ def handle_enter():
     if 'retriever' in st.session_state:
         user_input = st.session_state.user_input
         if user_input:
+            if len(user_input.split()) > 4097:
+                st.warning("Girdi çok uzun! Lütfen daha kısa bir soru sorun.")
+                return
             st.session_state.chat_history.append(("You", user_input))
             with st.spinner("Please wait..."):  # Show a loading spinner
                 try:
@@ -109,7 +108,7 @@ def handle_enter():
                     st.session_state.chat_history.append(("Bot", bot_response))
                 except Exception as e:
                     st.session_state.chat_history.append(("Bot", f"Error - {e}"))
-            st.session_state.user_input = ""  # Clear the input box after processing
+            st.session_state.user_input = ""  
 
 
 def main():
@@ -156,6 +155,7 @@ def main():
 
         if st.session_state.user_input:
             handle_enter()
+
 
 if __name__ == "__main__":
     main()
