@@ -6,7 +6,7 @@ import random
 # from Q_generator import generate_questions
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Pinecone
+from langchain.vectorstores import Pinecone as PineconeStore
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationSummaryBufferMemory # sorun olursa imha et
@@ -49,13 +49,11 @@ memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100) #sorun ol
 conversation = ConversationChain(llm=llm, memory=memory, verbose=True) #sorun olursa imha et
 
 # Pinecone index name
-import pinecone
+from pinecone import Pinecone
 
-pinecone.init(      
-	api_key='ca6c8826-93b2-40ad-b4f6-ad0ac76373fa',      
-	environment='gcp-starter'      
-)      
-index = pinecone.Index('chatbot')
+pc = Pinecone(api_key="ca6c8826-93b2-40ad-b4f6-ad0ac76373fa")
+index = pc.Index("chatbot")
+
 
 
 def extract_text_from_pdf(uploaded_file):
@@ -64,7 +62,8 @@ def extract_text_from_pdf(uploaded_file):
     return pages
 
 def embed_and_store(pages, embeddings_model):
-    docsearch = Pinecone.from_texts(pages, embeddings_model, index_name="chatbot")
+    docsearch=PineconeStore.from_texts(pages,embeddings_model,index_name="chatbot")
+    #docsearch = Pinecone.from_texts(pages, embeddings_model, index_name="chatbot")
     return docsearch
 
 def save_questions_to_file(questions, filename="generated_questions.txt", num_questions=20):
